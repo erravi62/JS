@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="x-ua-compatible" content="ie=edge">
+<title>Keyword Optimizer</title>
+
+<!-- CSS -->
+<style>
+.myForm {
+font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+font-size: 0.8em;
+width: 20em;
+/*padding: 1em;
+border: 1px solid #ccc;*/
+}
+
+.myForm * {
+box-sizing: border-box;
+}
+
+.myForm fieldset {
+border: none;
+padding: 0;
+}
+
+.myForm legend,
+.myForm label {
+padding: 0;
+font-weight: bold;
+}
+
+.myForm label.choice {
+font-size: 0.9em;
+font-weight: normal;
+}
+
+.myForm input[type="text"],
+.myForm input[type="tel"],
+.myForm input[type="email"],
+.myForm input[type="datetime-local"],
+.myForm select,
+.myForm textarea {
+display: block;
+width: 100%;
+border: 1px solid #ccc;
+font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+font-size: 0.9em;
+padding: 0.3em;
+}
+
+.myForm textarea {
+height: 100px;
+}
+
+.myForm button {
+padding: 1em;
+border-radius: 0.5em;
+background: #eee;
+border: none;
+font-weight: bold;
+margin-top: 1em;
+}
+
+.myForm button:hover {
+background: #ccc;
+cursor: pointer;
+}
+table {
+    border-collapse: collapse;
+}
+.table-div {
+    float: left;
+}
+td {
+    padding:10px; 
+}
+tbody td {
+	border: 1px solid #ddd;
+}
+
+	  form.myForm {
+    float: left;
+    margin-right: 30px;
+}
+.wrapper {
+    border: 1px solid #ddd;
+    padding: 30px;
+    display: inline-block;
+    width: 100%;
+    box-sizing: border-box;
+}
+.greenclass{
+color:green;
+}
+.redclass{
+color:red;
+}
+.yellowclass{
+color:orange;
+}
+</style>
+</head>
+<body>
+<div class="wrapper">
+<form name="myForm" class="myForm" method="get" enctype="application/x-www-form-urlencoded" action="/html/codes/html_form_handler.cfm">
+
+<p>
+<label>Title
+<input class="displaycell" onchange="populateTableValues()" value="Really beautiful plush robe" type="text" name="title" required>
+</label> 
+</p>
+
+<p>
+<label>Feature1 
+<input class="displaycell features" onchange="populateTableValues()" value="Fancy patterns on this nice robe" type="text" name="features_1">
+</label>
+</p>
+<p>
+<label>Feature2
+<input class="displaycell features" class="displaycell" onchange="populateTableValues()" value="The robe is made of good material" type="text" name="features_2">
+</label>
+</p>
+<p>
+<label>Feature3
+<input class="features" onchange="populateTableValues()" value="No other clothes compare!" type="text" name="features_3">
+</label>
+</p>
+<p>
+<label>Feature4
+<input class="features" onchange="populateTableValues()" value="I wear my soft robe all the time" type="text" name="features_4">
+</label>
+</p>
+<p>
+<label>Feature5
+<input class="features" onchange="populateTableValues()" value="This is great and soft" type="text" name="features_5">
+</label>
+</p>
+<p>
+<label>Description
+<input class="displaycell" onchange="populateTableValues()" value="This soft robe is really beautiful. <b>Buy now!</b>" type="text" name="description">
+</label>
+</p>
+<p>
+<label>Search Terms
+<input class="displaycell" onchange="populateTableValues()" type="text" value="soft beautiful robe" name="searchterms">
+</label>
+</p>
+<p>
+<label>Target Keyword Phrases(one per line)
+<textarea id="targetphrases" onchange="populateTableValues()" name="targetphrases" maxlength="500">
+soft robe
+beautiful robe
+great clothes
+plush robe
+nike robe
+</textarea>
+</label>
+</p>
+
+<p>
+<label>Words to ignore(one per line)
+<textarea id="ignoredwords" onchange="populateTableValues()" name="ignoredwords" maxlength="500">nike</textarea>
+</label>
+</p>
+<p>
+<input id="plural_check" onchange="populateTableValues()" type="checkbox" name="plural_check" value=""><label for="plural_check">Consider plural and singular as same?</label>
+</p>
+
+</form>
+<div class="table-div">
+<table id="customTable">
+<caption>
+Keyword Optimizer</caption>
+<thead>
+<tr>
+    <td> Keyword Phrase </td>
+    <td> Title </td>
+    <td> Features x1 </td>
+    <td> Features x2 </td>
+    <td> Description </td>
+    <td> Search Terms </td>
+</tr>
+</thead>
+<tbody>
+</tbody>
+</table>
+</div>
+</div>
+<script>
+String.prototype.plural = function(revert){
+
+    var plural = {
+        '(quiz)$'               : "$1zes",
+        '^(ox)$'                : "$1en",
+        '([m|l])ouse$'          : "$1ice",
+        '(matr|vert|ind)ix|ex$' : "$1ices",
+        '(x|ch|ss|sh)$'         : "$1es",
+        '([^aeiouy]|qu)y$'      : "$1ies",
+        '(hive)$'               : "$1s",
+        '(?:([^f])fe|([lr])f)$' : "$1$2ves",
+        '(shea|lea|loa|thie)f$' : "$1ves",
+        'sis$'                  : "ses",
+        '([ti])um$'             : "$1a",
+        '(tomat|potat|ech|her|vet)o$': "$1oes",
+        '(bu)s$'                : "$1ses",
+        '(alias)$'              : "$1es",
+        '(octop)us$'            : "$1i",
+        '(ax|test)is$'          : "$1es",
+        '(us)$'                 : "$1es",
+        '([^s]+)$'              : "$1s"
+    };
+
+    var singular = {
+        '(quiz)zes$'             : "$1",
+        '(matr)ices$'            : "$1ix",
+        '(vert|ind)ices$'        : "$1ex",
+        '^(ox)en$'               : "$1",
+        '(alias)es$'             : "$1",
+        '(octop|vir)i$'          : "$1us",
+        '(cris|ax|test)es$'      : "$1is",
+        '(shoe)s$'               : "$1",
+        '(o)es$'                 : "$1",
+        '(bus)es$'               : "$1",
+        '([m|l])ice$'            : "$1ouse",
+        '(x|ch|ss|sh)es$'        : "$1",
+        '(m)ovies$'              : "$1ovie",
+        '(s)eries$'              : "$1eries",
+        '([^aeiouy]|qu)ies$'     : "$1y",
+        '([lr])ves$'             : "$1f",
+        '(tive)s$'               : "$1",
+        '(hive)s$'               : "$1",
+        '(li|wi|kni)ves$'        : "$1fe",
+        '(shea|loa|lea|thie)ves$': "$1f",
+        '(^analy)ses$'           : "$1sis",
+        '((a)naly|(b)a|(d)iagno|(p)arenthe|(p)rogno|(s)ynop|(t)he)ses$': "$1$2sis",        
+        '([ti])a$'               : "$1um",
+        '(n)ews$'                : "$1ews",
+        '(h|bl)ouses$'           : "$1ouse",
+        '(corpse)s$'             : "$1",
+        '(us)es$'                : "$1",
+        's$'                     : ""
+    };
+
+    var irregular = {
+        'move'   : 'moves',
+        'foot'   : 'feet',
+        'goose'  : 'geese',
+        'sex'    : 'sexes',
+        'child'  : 'children',
+        'man'    : 'men',
+        'tooth'  : 'teeth',
+        'person' : 'people'
+    };
+
+    var uncountable = [
+        'sheep', 
+        'fish',
+        'deer',
+        'moose',
+        'series',
+        'species',
+        'money',
+        'rice',
+        'information',
+        'equipment'
+    ];
+
+    // save some time in the case that singular and plural are the same
+    if(uncountable.indexOf(this.toLowerCase()) >= 0)
+      return this;
+
+    // check for irregular forms
+    for(word in irregular){
+
+      if(revert){
+              var pattern = new RegExp(irregular[word]+'$', 'i');
+              var replace = word;
+      } else{ var pattern = new RegExp(word+'$', 'i');
+              var replace = irregular[word];
+      }
+      if(pattern.test(this))
+        return this.replace(pattern, replace);
+    }
+
+    if(revert) var array = singular;
+         else  var array = plural;
+
+    // check for matches using regular expressions
+    for(reg in array){
+
+      var pattern = new RegExp(reg, 'i');
+
+      if(pattern.test(this))
+        return this.replace(pattern, array[reg]);
+    }
+
+    return this;
+}
+function insertRow(txt) {
+	var table = document.getElementById("customTable").getElementsByTagName('tbody')[0];
+	var checkifexists = table.rows.namedItem(txt);
+	if(!checkifexists){
+	  var newRow   = table.insertRow(table.rows.length);
+	  newRow.id  = txt;
+	  var newCell  = newRow.insertCell(0);
+	  newCell.innerHTML = txt;
+	}
+}
+function insertCell(rowVal,cellVal,fieldVal) {
+	var table = document.getElementById("customTable").getElementsByTagName('tbody')[0];
+	var checkifexists = table.rows.namedItem(rowVal);
+	if(checkifexists){
+		if(!checkifexists.cells.namedItem(fieldVal)){
+			var x = checkifexists.insertCell(-1);
+		}else{
+			var x = checkifexists.cells.namedItem(fieldVal);
+		}
+		x.innerHTML=cellVal;
+		x.id = fieldVal;
+	}
+}
+function checkValue(val) {
+  return val != '';
+}
+function populateTableValues(){
+html = new Array();
+document.getElementById("customTable").getElementsByTagName('tbody')[0].innerHTML = '';
+var targetphrases = document.getElementById('targetphrases');
+var lines = targetphrases.value.split('\n').filter(checkValue);
+	for(var i = 0;i < lines.length;i++){
+		//if(i==0){
+			processData(lines[i]);
+		//}
+	}
+}
+function processData(name){
+ insertRow(name);
+ var inputs = document.forms["myForm"].getElementsByClassName("displaycell");
+ for (var j = 0; j < inputs.length; j++){
+		val = checkavailaibility(inputs[j],name);
+		insertCell(name,val,inputs[j].name);
+ }
+}
+
+function getAllIndexes(arr, val) {
+    var indexes = [], i = -1;
+    while ((i = arr.indexOf(val, i+1)) != -1){
+        indexes.push(i);
+    }
+    return indexes;
+}
+Array.prototype.remove = function(){
+    var args = Array.apply(null, arguments);
+    var indices = [];
+    for(var i = 0; i < args.length; i++){
+        var arg = args[i];
+        var index = this.indexOf(arg);
+        while(index > -1){
+            indices.push(index);
+            index = this.indexOf(arg, index + 1);
+        }
+    }
+    indices.sort();
+    for(var i = 0; i < indices.length; i++){
+        var index = indices[i] - i;
+        this.splice(index, 1);
+    }    
+}
+function wordInString(s, word){
+  return new RegExp( '\\b' + word + '\\b', 'i').test(s);
+}
+function countOcurrences(str, value) {
+  var regExp = new RegExp(value, "gi");
+  return (str.match(regExp) || []).length;
+}
+function escapeRegExp(string){
+	return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+function replaceAll(str, term, replacement) {
+  return str.replace(new RegExp(escapeRegExp(term), 'g'), replacement);
+}
+function checkavailaibility(input,name){
+	var inputstr = input.value;
+	var counter = 0;
+	var res = [];
+	if(input.name.match('features')){
+		var inputArr = [];
+		var inputs = document.forms["myForm"].getElementsByClassName("features");
+		for (var j = 0; j < inputs.length; j++){
+			if(inputs[j].value!=''){
+			inputArr[j] = inputs[j].value;
+			}
+		}
+		inputstr = inputArr.join(' | ');
+	}
+	var pluralcheck = document.getElementById("plural_check").checked;
+	if(pluralcheck){
+		res =  name.split(' ');
+		var pluralnameArr = [];
+		for(p=0;p<res.length;p++){
+			if(wordInString(inputstr,res[p])){
+				inputstr = replaceAll(inputstr, res[p], res[p].plural(true));
+				pluralnameArr[p] = res[p].plural(true);
+			}
+			else if(wordInString(inputstr,res[p].plural(true))){
+				inputstr = replaceAll(inputstr, res[p].plural(true), res[p]);
+				pluralnameArr[p] = res[p];
+			}
+		}
+		name = pluralnameArr.join(' ');
+	}
+	var ignoredwords = document.getElementById('ignoredwords');
+	var words = ignoredwords.value.split('\n').filter(checkValue);
+	var wordscheck = name.split(' ').filter(value => -1 !== words.indexOf(value));
+	var res=[];
+	var res2=[];
+	res2 =  inputstr.split(' ');
+	res =  name.split(' ');
+	if(wordscheck.length > 0 && input.name!='searchterms'){
+		for(k=0;k<wordscheck.length;k++){
+		 var index = res2.indexOf(wordscheck[k]);
+		 var index2 = res.indexOf(wordscheck[k]);
+			if (index > -1) {
+			   res2.splice(index, 1);
+			}
+			if (index2 > -1) {
+			   res.splice(index2, 1);
+			}
+		}
+		inputstr = res2.join(' ');
+		name = res.join(' ');
+	}
+	if(input.name=='features_1'){
+		res = name.split(' ');
+		var valid = true;
+		for(m=0;m < res.length;m++){
+			if(wordInString(inputstr,res[m])){
+				counter += countOcurrences(inputstr,res[m]);
+			}else{
+				valid = false;
+			}
+		}
+		if(!valid){
+			counter = 0;
+		}
+		if(wordInString(inputstr,name) && countOcurrences(inputstr,name) >= 1){
+			return '<span class="greenclass">Yes</span>';
+		}else if(counter >= res.length){
+			return '<span class="yellowclass">Split Up</span>';
+		}else{
+			return '<span class="redclass">No</span>';
+		}
+	}
+	else if(input.name=='features_2'){
+		res = name.split(' ');
+		var valid = true;
+		for(m=0;m < res.length;m++){
+			if(wordInString(inputstr,res[m])){
+				counter += countOcurrences(inputstr,res[m]);
+			}else{
+				valid = false;
+			}
+		}
+		if(!valid){
+			counter = 0;
+		}
+		if(wordInString(inputstr,name) && countOcurrences(inputstr,name) >= 2){
+			return '<span class="greenclass">Yes</span>';
+		}else if(parseInt(counter/2) >= res.length){
+			return '<span class="yellowclass">Split Up</span>';
+		}else{
+			return '<span class="redclass">No</span>';
+		}
+	}else if(input.name=='searchterms'){
+		res = name.split(' ');
+		for(m=0;m < res.length;m++){
+			if(wordInString(inputstr,res[m])){
+				counter++;
+			}
+		}
+		if(wordInString(inputstr,name) || (counter >= res.length)){
+			return '<span class="greenclass">Yes</span>';
+		}else{
+			return '<span class="redclass">No</span>';
+		}
+	}
+	else{
+		res = name.split(' ');
+		for(m=0;m < res.length;m++){
+			if(wordInString(inputstr,res[m])){
+				counter++;
+			}
+		}
+		if(wordInString(inputstr,name)){
+			return '<span class="greenclass">Yes</span>';
+		}else if(counter >= res.length){
+			return '<span class="yellowclass">Split Up</span>';
+		}else{
+			return '<span class="redclass">No</span>';
+		}
+	}
+}
+populateTableValues();
+</script>
+</body>
+</html>
